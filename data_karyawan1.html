@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Karyawan</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #eef2f3;
+      margin: 0;
+    }
+    header {
+      background: #492828;
+      color: white;
+      text-align: center;
+      padding: 15px;
+    }
+    form {
+      background: white;
+      padding: 20px;
+      margin: 20px auto;
+      width: 80%;
+      border-radius: 10px;
+    }
+    input, button {
+      padding: 8px;
+      margin: 5px;
+    }
+    button {
+      background: #492828;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #6a3a3a;
+    }
+    table {
+      width: 80%;
+      margin: 20px auto;
+      border-collapse: collapse;
+      background: white;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background: #492828;
+      color: white;
+    }
+    a {
+      text-align: center;
+      display: block;
+      margin-top: 20px;
+      color: #492828;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <header><h1>Data Karyawan</h1></header>
+
+  <form id="formKaryawan">
+    <input type="text" id="nama" placeholder="Nama Karyawan" required>
+    <input type="text" id="alamat" placeholder="Alamat" required>
+    <input type="text" id="jabatan" placeholder="Jabatan" required>
+    <input type="text" id="nohp" placeholder="No HP" required>
+    <button type="submit" id="btnSubmit">Tambah Data</button>
+  </form>
+
+  <table id="tabelKaryawan">
+    <thead>
+      <tr>
+        <th>Nama</th>
+        <th>Alamat</th>
+        <th>Jabatan</th>
+        <th>No HP</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <a href="index.html">← Kembali</a>
+
+  <script>
+    const form = document.getElementById("formKaryawan");
+    const tbody = document.querySelector("#tabelKaryawan tbody");
+    const btnSubmit = document.getElementById("btnSubmit");
+    let data = JSON.parse(localStorage.getItem("karyawan")) || [];
+    let editIndex = null;
+
+    // Fungsi render tabel
+    function render() {
+      tbody.innerHTML = "";
+      data.forEach((k, i) => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${k.nama}</td>
+            <td>${k.alamat}</td>
+            <td>${k.jabatan}</td>
+            <td>${k.nohp}</td>
+            <td>
+              <button onclick="editData(${i})">Edit</button>
+              <button onclick="hapusData(${i})">Hapus</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    // Tambah atau simpan perubahan
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      const k = {
+        nama: form.nama.value,
+        alamat: form.alamat.value,
+        jabatan: form.jabatan.value,
+        nohp: form.nohp.value
+      };
+
+      if (editIndex === null) {
+        data.push(k);
+      } else {
+        data[editIndex] = k;
+        editIndex = null;
+        btnSubmit.textContent = "Tambah Data";
+      }
+
+      localStorage.setItem("karyawan", JSON.stringify(data));
+      form.reset();
+      render();
+    });
+
+    // Fungsi hapus data
+    function hapusData(index) {
+      if (confirm("Yakin ingin menghapus data ini?")) {
+        data.splice(index, 1);
+        localStorage.setItem("karyawan", JSON.stringify(data));
+        render();
+      }
+    }
+
+    // Fungsi edit data
+    function editData(index) {
+      const k = data[index];
+      form.nama.value = k.nama;
+      form.alamat.value = k.alamat;
+      form.jabatan.value = k.jabatan;
+      form.nohp.value = k.nohp;
+      editIndex = index;
+      btnSubmit.textContent = "Simpan Perubahan";
+      form.scrollIntoView({ behavior: "smooth" });
+    }
+
+    // Render awal
+    render();
+  </script>
+</body>
+</html>
